@@ -1,0 +1,48 @@
+/*****************************************************************************
+TITLE: Claims				
+AUTHOR: Hemant Kumar (2301CS20)
+Declaration of Authorship
+This txt file, claims.txt, is part of the miniproject assignment of course CS2102 at CSE Dept. IIT Patna
+*****************************************************************************/
+
+Files:
+==========
+*All the files i submitted, emu.cpp and claims.txt, have my name and student id at the start, along with a declaration of 
+authorship.
+
+* Files included are trace output for some test samples, emu.cpp, emu(executable)
+
+Compilation instructions:
+=========================
+	
+	g++ -std=c++11 -Wall -Wextra -pedantic asm.cpp -o asm
+	./emu -[commands] filename.o
+
+	Commands are 
+	-trace  show instruction trace
+	-read   show memory reads
+	-write  show memory writes
+	-before show memory dump before execution
+	-after  show memory dump after execution
+	-wipe   wipe written flags before execution
+
+Assumptions:
+============
+    * Mnemonic named “data” is always used at the end of assembly code.
+    * In trace, printed register values(or SP or PC) are values after execution of the current line
+
+NOTE:
+=====
+	* Every claim about assembler is already submitted and it satisfies here too (for emulator)
+	* all the commands work as mentioned above.
+
+The emulator: 
+=============
+(some files which were tested)
+1. test04.o
+	compiles successfully with all functionalities working as mentioned above
+
+2. customTest01.o
+	compiles successfully with all functionalities working as mentioned above
+
+all other files are supposed to work fine too.

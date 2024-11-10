@@ -1,0 +1,8 @@
+Line: 4 ERROR: Duplicate label
+Line: 6 ERROR: Invalid parameter
+Line: 7 ERROR: Missing parameter
+Line: 8 ERROR: Unexpected parameter
+Line: 9 ERROR: Extra tokens
+Line: 10 ERROR: Invalid label format
+Line: 11 ERROR: Unknown command
+Line: 12 ERROR: Unknown command
