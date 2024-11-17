@@ -5,12 +5,12 @@ Declaration of Authorship
 This emu.cpp file, is part of the miniproject assignment of course CS2102 at CSE Dept. IIT Patna
 *****************************************************************************/
 #include <bits/stdc++.h>
-
+using namespace std;
 class EmulatorState
 {
 private:
-  std::vector<uint32_t> program_memory;
-  std::unordered_map<std::string, std::pair<uint8_t, uint8_t>> instruction_set;
+  vector<uint32_t> program_memory;
+  unordered_map<string, pair<uint8_t, uint8_t>> instruction_set;
   uint32_t accumulator;
   uint32_t backup_reg;
   uint32_t stack_ptr;
@@ -38,36 +38,36 @@ public:
   {
     // Instruction format: name, opcode, operand_type
     // operand_type: 0=none, 1=value, 2=offset
-    const std::vector<std::tuple<std::string, uint8_t, uint8_t>> instructions = {
-        std::make_tuple("push_const", 0x00, 1),
-        std::make_tuple("add_const", 0x01, 1),
-        std::make_tuple("load_local", 0x02, 2),
-        std::make_tuple("store_local", 0x03, 2),
-        std::make_tuple("load_indirect", 0x04, 2),
-        std::make_tuple("store_indirect", 0x05, 2),
-        std::make_tuple("sum", 0x06, 0),
-        std::make_tuple("difference", 0x07, 0),
-        std::make_tuple("shift_left", 0x08, 0),
-        std::make_tuple("shift_right", 0x09, 0),
-        std::make_tuple("stack_adjust", 0x0A, 1),
-        std::make_tuple("acc_to_stack", 0x0B, 0),
-        std::make_tuple("stack_to_acc", 0x0C, 0),
-        std::make_tuple("procedure_call", 0x0D, 2),
-        std::make_tuple("procedure_return", 0x0E, 0),
-        std::make_tuple("branch_zero", 0x0F, 2),
-        std::make_tuple("branch_negative", 0x10, 2),
-        std::make_tuple("branch_always", 0x11, 2),
-        std::make_tuple("terminate", 0x12, 0)};
+    const vector<tuple<string, uint8_t, uint8_t>> instructions = {
+        make_tuple("push_const", 0x00, 1),
+        make_tuple("add_const", 0x01, 1),
+        make_tuple("load_local", 0x02, 2),
+        make_tuple("store_local", 0x03, 2),
+        make_tuple("load_indirect", 0x04, 2),
+        make_tuple("store_indirect", 0x05, 2),
+        make_tuple("sum", 0x06, 0),
+        make_tuple("difference", 0x07, 0),
+        make_tuple("shift_left", 0x08, 0),
+        make_tuple("shift_right", 0x09, 0),
+        make_tuple("stack_adjust", 0x0A, 1),
+        make_tuple("acc_to_stack", 0x0B, 0),
+        make_tuple("stack_to_acc", 0x0C, 0),
+        make_tuple("procedure_call", 0x0D, 2),
+        make_tuple("procedure_return", 0x0E, 0),
+        make_tuple("branch_zero", 0x0F, 2),
+        make_tuple("branch_negative", 0x10, 2),
+        make_tuple("branch_always", 0x11, 2),
+        make_tuple("terminate", 0x12, 0)};
 
     for (const auto &inst : instructions)
     {
-      instruction_set[std::get<0>(inst)] = std::make_pair(std::get<1>(inst), std::get<2>(inst));
+      instruction_set[get<0>(inst)] = make_pair(get<1>(inst), get<2>(inst));
     }
   }
 
-  bool load_program(const std::string &filename)
+  bool load_program(const string &filename)
   {
-    std::ifstream input(filename.c_str(), std::ios::binary); // Use c_str() for C++11
+    ifstream input(filename.c_str(), ios::binary); // Use c_str() for C++11
     if (!input)
       return false;
 
@@ -185,16 +185,16 @@ public:
     }
   }
 
-  std::string format_hex(uint32_t value) const
+  string format_hex(uint32_t value) const
   {
-    std::ostringstream ss;
-    ss << std::uppercase << std::setfill('0') << std::setw(8) << std::hex << value;
+    ostringstream ss;
+    ss << uppercase << setfill('0') << setw(8) << hex << value;
     return ss.str();
   }
 
   void print_trace(uint8_t opcode, int32_t operand) const
   {
-    std::cout << "PC=" << format_hex(program_counter - 1)
+    cout << "PC=" << format_hex(program_counter - 1)
               << " SP=" << format_hex(stack_ptr)
               << " A=" << format_hex(accumulator)
               << " B=" << format_hex(backup_reg) << " ";
@@ -203,31 +203,31 @@ public:
     {
       if (pair.second.first == opcode)
       {
-        std::cout << pair.first;
+        cout << pair.first;
         if (pair.second.second > 0)
         {
-          std::cout << " " << format_hex(static_cast<uint32_t>(operand));
+          cout << " " << format_hex(static_cast<uint32_t>(operand));
         }
         break;
       }
     }
-    std::cout << std::endl;
+    cout << endl;
   }
 
   void memory_dump() const
   {
     for (size_t i = 0; i < program_memory.size(); i += 4)
     {
-      std::cout << format_hex(static_cast<uint32_t>(i)) << " ";
-      for (size_t j = i; j < std::min(program_memory.size(), i + 4); j++)
+      cout << format_hex(static_cast<uint32_t>(i)) << " ";
+      for (size_t j = i; j < min(program_memory.size(), i + 4); j++)
       {
-        std::cout << format_hex(program_memory[j]) << " ";
+        cout << format_hex(program_memory[j]) << " ";
       }
-      std::cout << std::endl;
+      cout << endl;
     }
   }
 
-  void execute(const std::string &mode)
+  void execute(const string &mode)
   {
     bool trace = (mode == "-trace");
     bool read_mode = (mode == "-read");
@@ -241,14 +241,14 @@ public:
       uint8_t opcode = current & 0xFF;
       if (read_mode && (opcode == 0x02 || opcode == 0x04))
       {
-        std::cout << "Reading memory[" << format_hex(last_mem_op.address)
-                  << "] finds " << format_hex(accumulator) << std::endl;
+        cout << "Reading memory[" << format_hex(last_mem_op.address)
+                  << "] finds " << format_hex(accumulator) << endl;
       }
       if (write_mode && (opcode == 0x03 || opcode == 0x05))
       {
-        std::cout << "Writing memory[" << format_hex(last_mem_op.address)
+        cout << "Writing memory[" << format_hex(last_mem_op.address)
                   << "] was " << format_hex(last_mem_op.old_value)
-                  << " now " << format_hex(program_memory[last_mem_op.address]) << std::endl;
+                  << " now " << format_hex(program_memory[last_mem_op.address]) << endl;
       }
       if (opcode >= 0x12)
         break;
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
 {
   if (argc <= 2)
   {
-    std::cout << "Usage: " << argv[0] << " [mode] filename.o\n"
+    cout << "Usage: " << argv[0] << " [mode] filename.o\n"
               << "Modes:\n"
               << "  -trace   Show instruction trace\n"
               << "  -read    Show memory reads\n"
@@ -285,18 +285,18 @@ int main(int argc, char *argv[])
   }
 
   EmulatorState emu;
-  std::string mode(argv[1]);
-  std::string filename(argv[2]);
+  string mode(argv[1]);
+  string filename(argv[2]);
 
   if (!emu.load_program(filename))
   {
-    std::cout << "Failed to load program file\n";
+    cout << "Failed to load program file\n";
     return 1;
   }
 
   if (mode == "-before")
   {
-    std::cout << "memory dump before execution\n";
+    cout << "memory dump before execution\n";
     emu.memory_dump();
   }
   else if (mode == "-wipe")
@@ -310,10 +310,10 @@ int main(int argc, char *argv[])
 
   if (mode == "-after")
   {
-    std::cout << "memory dump after execution\n";
+    cout << "memory dump after execution\n";
     emu.memory_dump();
   }
 
-  std::cout << emu.get_instruction_count() << " instructions executed\n";
+  cout << emu.get_instruction_count() << " instructions executed\n";
   return 0;
 }

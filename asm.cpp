@@ -6,8 +6,8 @@ This asm.cpp file, is part of the miniproject assignment of course CS2102 at CSE
 *****************************************************************************/
 
 #include <bits/stdc++.h>
-
-std::string file_initial = "test";
+using namespace std;
+string file_initial = "test";
 
 class ProcessorLogic
 {
@@ -16,21 +16,21 @@ private:
   {
   public:
     int pc;
-    std::string tag;
-    std::string cmd;
-    std::string arg;
-    std::string origArg;
+    string tag;
+    string cmd;
+    string arg;
+    string origArg;
 
-    LineItem(int p, std::string t, std::string c, std::string a, std::string o) : pc(p), tag(t), cmd(c), arg(a), origArg(o) {}
+    LineItem(int p, string t, string c, string a, string o) : pc(p), tag(t), cmd(c), arg(a), origArg(o) {}
   };
 
   class IssueItem
   {
   public:
     int pos;
-    std::string text;
+    string text;
 
-    IssueItem(int p, std::string t) : pos(p), text(t) {}
+    IssueItem(int p, string t) : pos(p), text(t) {}
 
     bool operator<(const IssueItem &other) const
     {
@@ -38,26 +38,26 @@ private:
     }
   };
 
-  std::map<std::string, std::pair<int, int>> symTable;
-  std::map<std::string, std::string> varTable;
-  std::map<std::string, std::vector<int>> refTable;
-  std::map<int, std::string> noteTable;
-  std::map<std::string, std::pair<std::string, int>> cmdTable;
+  map<string, pair<int, int>> symTable;
+  map<string, string> varTable;
+  map<string, vector<int>> refTable;
+  map<int, string> noteTable;
+  map<string, pair<string, int>> cmdTable;
 
-  std::vector<LineItem> codeLines;
-  std::vector<std::string> binOutput;
-  std::vector<std::tuple<std::string, std::string, std::string>> listOutput;
-  std::vector<IssueItem> errorList;
-  std::vector<IssueItem> warnList;
+  vector<LineItem> codeLines;
+  vector<string> binOutput;
+  vector<tuple<string, string, string>> listOutput;
+  vector<IssueItem> errorList;
+  vector<IssueItem> warnList;
 
   bool verifyChar(char c, bool first) const
   {
     if (first)
-      return std::isalpha(c) != 0;
-    return std::isalnum(c) != 0 || c == '_';
+      return isalpha(c) != 0;
+    return isalnum(c) != 0 || c == '_';
   }
 
-  bool verifyTag(const std::string &str) const
+  bool verifyTag(const string &str) const
   {
     if (str.empty())
       return false;
@@ -71,13 +71,13 @@ private:
     return true;
   }
 
-  std::string processValue(const std::string &val)
+  string processValue(const string &val)
   {
     if (val.empty())
       return "";
 
     size_t start = 0;
-    std::string prefix;
+    string prefix;
     if (val[0] == '+' || val[0] == '-')
     {
       prefix = val.substr(0, 1);
@@ -86,7 +86,7 @@ private:
         return "";
     }
 
-    std::string num = val.substr(start);
+    string num = val.substr(start);
     if (num[0] == '0')
     {
       if (num.length() == 1)
@@ -100,22 +100,22 @@ private:
 
     for (char c : num)
     {
-      if (!std::isdigit(c))
+      if (!isdigit(c))
         return "";
     }
     return val;
   }
 
-  std::string convertBase(const std::string &num, int base, const std::string &prefix)
+  string convertBase(const string &num, int base, const string &prefix)
   {
     int result = 0;
     for (char c : num)
     {
       if (base == 16)
       {
-        if (!std::isxdigit(c))
+        if (!isxdigit(c))
           return "";
-        result = result * 16 + (std::isdigit(c) ? c - '0' : (std::tolower(c) - 'a' + 10));
+        result = result * 16 + (isdigit(c) ? c - '0' : (tolower(c) - 'a' + 10));
       }
       else
       {
@@ -124,23 +124,23 @@ private:
         result = result * 8 + (c - '0');
       }
     }
-    return prefix + std::to_string(result);
+    return prefix + to_string(result);
   }
 
-  std::string toHexStr(int val) const
+  string toHexStr(int val) const
   {
-    std::ostringstream ss;
-    ss << std::setfill('0') << std::setw(8) << std::uppercase << std::hex
+    ostringstream ss;
+    ss << setfill('0') << setw(8) << uppercase << hex
        << static_cast<unsigned int>(val);
     return ss.str();
   }
 
-  void logError(int line, const std::string &msg)
+  void logError(int line, const string &msg)
   {
     errorList.push_back(IssueItem(line, msg));
   }
 
-  void logWarning(int line, const std::string &msg)
+  void logWarning(int line, const string &msg)
   {
     warnList.push_back(IssueItem(line, msg));
   }
@@ -153,19 +153,19 @@ public:
 
   void setupCommands()
   {
-    const std::vector<std::tuple<std::string, std::string, int>> cmds = {
+    const vector<tuple<string, string, int>> cmds = {
         {"data", "", 1}, {"ldc", "00", 1}, {"adc", "01", 1}, {"ldl", "02", 2}, {"stl", "03", 2}, {"ldnl", "04", 2}, {"stnl", "05", 2}, {"add", "06", 0}, {"sub", "07", 0}, {"shl", "08", 0}, {"shr", "09", 0}, {"adj", "0A", 1}, {"a2sp", "0B", 0}, {"sp2a", "0C", 0}, {"call", "0D", 2}, {"return", "0E", 0}, {"brz", "0F", 2}, {"brlz", "10", 2}, {"br", "11", 2}, {"HALT", "12", 0}, {"SET", "", 1}};
 
     for (const auto &cmd : cmds)
     {
-      cmdTable[std::get<0>(cmd)] = std::make_pair(std::get<1>(cmd), std::get<2>(cmd));
+      cmdTable[get<0>(cmd)] = make_pair(get<1>(cmd), get<2>(cmd));
     }
   }
 
-  std::vector<std::string> tokenizeLine(const std::string &line)
+  vector<string> tokenizeLine(const string &line)
   {
-    std::vector<std::string> tokens;
-    std::string current;
+    vector<string> tokens;
+    string current;
     bool inComment = false;
 
     for (size_t i = 0; i < line.length(); ++i)
@@ -185,7 +185,7 @@ public:
       if (inComment)
         continue;
 
-      if (std::isspace(c))
+      if (isspace(c))
       {
         if (!current.empty())
         {
@@ -211,7 +211,7 @@ public:
     return tokens;
   }
 
-  void analyzeCode(const std::vector<std::string> &code)
+  void analyzeCode(const vector<string> &code)
   {
     int lineNum = 0;
     int pc = 0;
@@ -223,7 +223,7 @@ public:
       if (tokens.empty())
         continue;
 
-      std::string tag, cmd, param;
+      string tag, cmd, param;
       size_t pos = 0;
 
       if (tokens[0].back() == ':')
@@ -239,7 +239,7 @@ public:
         param = tokens[pos++];
 
       bool validCmd = false;
-      std::string processedParam = param;
+      string processedParam = param;
 
       if (!tag.empty())
       {
@@ -253,7 +253,7 @@ public:
         }
         else
         {
-          symTable[tag] = std::make_pair(pc, lineNum);
+          symTable[tag] = make_pair(pc, lineNum);
         }
       }
 
@@ -274,7 +274,7 @@ public:
             }
             else
             {
-              std::string processed = verifyTag(param) ? param : processValue(param);
+              string processed = verifyTag(param) ? param : processValue(param);
 
               if (processed.empty())
               {
@@ -328,26 +328,26 @@ public:
   {
     for (const auto &line : codeLines)
     {
-      std::string machineCode = "        ";
+      string machineCode = "        ";
 
       if (!line.cmd.empty() && cmdTable.count(line.cmd))
       {
         int type = cmdTable[line.cmd].second;
-        std::string opcode = cmdTable[line.cmd].first;
+        string opcode = cmdTable[line.cmd].first;
 
         if (type == 2)
         {
-          int offset = symTable.count(line.arg) ? symTable[line.arg].first - (line.pc + 1) : std::stoi(line.arg);
+          int offset = symTable.count(line.arg) ? symTable[line.arg].first - (line.pc + 1) : stoi(line.arg);
           machineCode = toHexStr(offset).substr(2) + opcode;
         }
         else if (type == 1 && line.cmd != "data" && line.cmd != "SET")
         {
-          int value = symTable.count(line.arg) ? symTable[line.arg].first : std::stoi(varTable.count(line.arg) ? varTable[line.arg] : line.arg);
+          int value = symTable.count(line.arg) ? symTable[line.arg].first : stoi(varTable.count(line.arg) ? varTable[line.arg] : line.arg);
           machineCode = toHexStr(value).substr(2) + opcode;
         }
         else if (type == 1 && (line.cmd == "data" || line.cmd == "SET"))
         {
-          machineCode = toHexStr(std::stoi(line.arg));
+          machineCode = toHexStr(stoi(line.arg));
         }
         else if (type == 0)
         {
@@ -356,42 +356,42 @@ public:
       }
 
       binOutput.push_back(machineCode);
-      std::string statement = (line.tag.empty() ? "" : line.tag + ": ") +
+      string statement = (line.tag.empty() ? "" : line.tag + ": ") +
                               (line.cmd.empty() ? "" : line.cmd + " ") +
                               line.origArg;
-      listOutput.push_back(std::make_tuple(toHexStr(line.pc), machineCode, statement));
+      listOutput.push_back(make_tuple(toHexStr(line.pc), machineCode, statement));
     }
   }
 
   void writeOutput()
   {
-    std::ofstream listFile(file_initial + ".lst");
+    ofstream listFile(file_initial + ".lst");
     for (const auto &entry : listOutput)
     {
-      listFile << std::get<0>(entry) << " " << std::get<1>(entry) << " "
-               << std::get<2>(entry) << std::endl;
+      listFile << get<0>(entry) << " " << get<1>(entry) << " "
+               << get<2>(entry) << endl;
     }
     listFile.close();
 
-    std::ofstream binFile(file_initial + ".o", std::ios::binary);
+    ofstream binFile(file_initial + ".o", ios::binary);
     for (const auto &code : binOutput)
     {
       if (code == "        ")
         continue;
       unsigned int value;
-      std::istringstream(code) >> std::hex >> value;
+      istringstream(code) >> hex >> value;
       binFile.write(reinterpret_cast<const char *>(&value), sizeof(value));
     }
     binFile.close();
 
-    std::ofstream logFile(file_initial + ".log");
+    ofstream logFile(file_initial + ".log");
     if (errorList.empty())
     {
-      logFile << "No errors!" << std::endl;
+      logFile << "No errors!" << endl;
       for (const auto &warn : warnList)
       {
         logFile << "Line: " << warn.pos << " WARNING: "
-                << warn.text << std::endl;
+                << warn.text << endl;
       }
     }
     else
@@ -399,24 +399,24 @@ public:
       for (const auto &err : errorList)
       {
         logFile << "Line: " << err.pos << " ERROR: "
-                << err.text << std::endl;
+                << err.text << endl;
       }
     }
     logFile.close();
   }
 
-  bool execute(const std::string &filename)
+  bool execute(const string &filename)
   {
-    std::ifstream input(filename);
+    ifstream input(filename);
     if (!input)
     {
-      std::cout << "Failed to open input file" << std::endl;
+      cout << "Failed to open input file" << endl;
       return false;
     }
 
-    std::vector<std::string> sourceCode;
-    std::string line;
-    while (std::getline(input, line))
+    vector<string> sourceCode;
+    string line;
+    while (getline(input, line))
     {
       sourceCode.push_back(line);
     }
@@ -428,7 +428,7 @@ public:
     {
       generateCode();
       writeOutput();
-      std::cout << "Generated: lst, .o, and .log files" << std::endl;
+      cout << "Generated: lst, .o, and .log files" << endl;
       return true;
     }
 
@@ -441,11 +441,11 @@ int main(int argc, char *argv[])
 {
   if (argc < 2)
   {
-    std::cerr << "Usage: " << argv[0] << " <filename>\n";
+    cerr << "Usage: " << argv[0] << " <filename>\n";
     return 1;
   }
 
-  std::string filename = argv[1];
+  string filename = argv[1];
   file_initial = filename.substr(0, filename.find('.'));
   ProcessorLogic processor;
   processor.execute(filename);
