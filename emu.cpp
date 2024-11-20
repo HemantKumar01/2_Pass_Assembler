@@ -39,25 +39,25 @@ public:
     // Instruction format: name, opcode, operand_type
     // operand_type: 0=none, 1=value, 2=offset
     const vector<tuple<string, uint8_t, uint8_t>> instructions = {
-        make_tuple("push_const", 0x00, 1),
-        make_tuple("add_const", 0x01, 1),
-        make_tuple("load_local", 0x02, 2),
-        make_tuple("store_local", 0x03, 2),
-        make_tuple("load_indirect", 0x04, 2),
-        make_tuple("store_indirect", 0x05, 2),
-        make_tuple("sum", 0x06, 0),
-        make_tuple("difference", 0x07, 0),
-        make_tuple("shift_left", 0x08, 0),
-        make_tuple("shift_right", 0x09, 0),
-        make_tuple("stack_adjust", 0x0A, 1),
-        make_tuple("acc_to_stack", 0x0B, 0),
-        make_tuple("stack_to_acc", 0x0C, 0),
-        make_tuple("procedure_call", 0x0D, 2),
-        make_tuple("procedure_return", 0x0E, 0),
-        make_tuple("branch_zero", 0x0F, 2),
-        make_tuple("branch_negative", 0x10, 2),
-        make_tuple("branch_always", 0x11, 2),
-        make_tuple("terminate", 0x12, 0)};
+        make_tuple("ldc", 0x00, 1),
+        make_tuple("adc", 0x01, 1),
+        make_tuple("ldl", 0x02, 2),
+        make_tuple("stl", 0x03, 2),
+        make_tuple("ldnl", 0x04, 2),
+        make_tuple("stnl", 0x05, 2),
+        make_tuple("add", 0x06, 0),
+        make_tuple("sub", 0x07, 0),
+        make_tuple("shl", 0x08, 0),
+        make_tuple("shr", 0x09, 0),
+        make_tuple("adj", 0x0A, 1),
+        make_tuple("a2sp", 0x0B, 0),
+        make_tuple("sp2a", 0x0C, 0),
+        make_tuple("call", 0x0D, 2),
+        make_tuple("return", 0x0E, 0),
+        make_tuple("brz", 0x0F, 2),
+        make_tuple("brlz", 0x10, 2),
+        make_tuple("br", 0x11, 2),
+        make_tuple("HALT", 0x12, 0)};
 
     for (const auto &inst : instructions)
     {
@@ -195,9 +195,9 @@ public:
   void print_trace(uint8_t opcode, int32_t operand) const
   {
     cout << "PC=" << format_hex(program_counter - 1)
-              << " SP=" << format_hex(stack_ptr)
-              << " A=" << format_hex(accumulator)
-              << " B=" << format_hex(backup_reg) << " ";
+         << " SP=" << format_hex(stack_ptr)
+         << " A=" << format_hex(accumulator)
+         << " B=" << format_hex(backup_reg) << " ";
 
     for (const auto &pair : instruction_set)
     {
@@ -242,13 +242,13 @@ public:
       if (read_mode && (opcode == 0x02 || opcode == 0x04))
       {
         cout << "Reading memory[" << format_hex(last_mem_op.address)
-                  << "] finds " << format_hex(accumulator) << endl;
+             << "] finds " << format_hex(accumulator) << endl;
       }
       if (write_mode && (opcode == 0x03 || opcode == 0x05))
       {
         cout << "Writing memory[" << format_hex(last_mem_op.address)
-                  << "] was " << format_hex(last_mem_op.old_value)
-                  << " now " << format_hex(program_memory[last_mem_op.address]) << endl;
+             << "] was " << format_hex(last_mem_op.old_value) 
+             << " now " << format_hex(program_memory[last_mem_op.address]) << endl;
       }
       if (opcode >= 0x12)
         break;
@@ -274,13 +274,13 @@ int main(int argc, char *argv[])
   if (argc <= 2)
   {
     cout << "Usage: " << argv[0] << " [mode] filename.o\n"
-              << "Modes:\n"
-              << "  -trace   Show instruction trace\n"
-              << "  -read    Show memory reads\n"
-              << "  -write   Show memory writes\n"
-              << "  -before  Show memory dump before execution\n"
-              << "  -after   Show memory dump after execution\n"
-              << "  -wipe    Reset registers before execution\n";
+         << "Modes:\n"
+         << "  -trace   Show instruction trace\n"
+         << "  -read    Show memory reads\n"
+         << "  -write   Show memory writes\n"
+         << "  -before  Show memory dump before execution\n"
+         << "  -after   Show memory dump after execution\n"
+         << "  -wipe    Reset registers before execution\n";
     return 1;
   }
 
