@@ -66,7 +66,7 @@ typedef struct
   int num_entries;
 } MemoryDump;
 MemoryDump memoryDumps;
-
+int showMemory = 1;
 void printPreText()
 {
   system("cls");
@@ -344,8 +344,10 @@ void viewFileWithScroll(FileContent *content)
     lastB = B;
     lastSP = SP;
     lastPC = PC;
-
-    displayMemory(ind);
+    if (showMemory == 1)
+    {
+      displayMemory(ind);
+    }
 
     key = getch();
 
@@ -380,8 +382,17 @@ void viewFileWithScroll(FileContent *content)
   }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+
+  if (argc > 1)
+  {
+    if (strcmp(argv[1], "-no-mem") == 0)
+    {
+      showMemory = 0;
+    }
+  }
+
   setlocale(LC_ALL, "en_US.UTF-8");
   printPreText();
 
